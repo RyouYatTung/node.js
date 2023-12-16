@@ -16,22 +16,25 @@ const server = http.createServer((req, res) => {
 
   if (url === "/message" && method === "POST") {
     const body = [];
-    //做個緩衝
+    //リクエストがデータを受信するたびに実行されるコールバック関数を登録しています
+    //それをbodyという配列に追加
     req.on("data", (chunk) => {
-      console.log(chunk);
       body.push(chunk);
     });
 
-    req.on("end", () => {
+    //リクエストのデータ受信が終了したとき
+    return req.on("end", () => {
+      //Buffer.concat()を使用してbodyに蓄積されたデータをまとめ
       const parseBody = Buffer.concat(body).toString();
-      console.log(parseBody);
+      const message = parseBody.split("=")[1];
+      fs.writeFile("message.txt", message, (err) => {
+        res.statusCode = 302;
+        res.writeHead("Location", "/");
+        return res.end();
+      });
     });
-
-    fs.writeFileSync("message.txt", "DUMMY");
-    res.statusCode = 302;
-    res.writeHead("Location", "/");
-    return res.end();
   }
+
   res.setHeader("Content-Type", "text/html");
   res.write("<html>");
   res.write("<head><title>not index</title></head>");
