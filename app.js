@@ -1,7 +1,6 @@
+const express = require("express");
+const app = express();
+
 const http = require("http");
-//routes.jsの読み込み
-const routes = require("./routes");
-
-const server = http.createServer(routes.handler);
-
+const server = http.createServer(app);
 server.listen(3000);
